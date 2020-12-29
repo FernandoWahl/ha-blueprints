@@ -1,0 +1,73 @@
+blueprint:
+  name: Motion sensor Workshop
+  domain: automation
+  source_url: https://github.com/home-assistant/core/blob/71af0fac1644821b9303815b680914b9eeca444d/homeassistant/components/automation/blueprints/motion_light.yaml
+  input:
+    motion_entity:
+      name: Motion sensor
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+    light_target:
+      name: Light
+      selector:
+        target:
+          entity:
+            domain: light
+    no_motion_wait:
+      name: Wait time
+      description: Time to wait until the light should be turned off.
+      default: 5
+      selector:
+        number:
+          min: 0
+          max: 3600
+          unit_of_measurement: seconds
+    time_limit_before:
+      name: Run ahead of time only.
+      description: Automation will only run when the time is earlier than this value
+      default: 07:30:00
+      selector:
+        entity:
+          domain: input_datetime
+    time_limit_after:
+      name: Run only after time.
+      description: Automation will only run when time is later than this value
+      default: '15: 30: 00 '
+      selector:
+        entity:
+          domain: input_datetime
+# If motion is detected within the delay,
+# we restart the script.
+mode: restart
+max_exceeded: silent
+
+variables:
+
+  time_limit_before:! input time_limit_before
+  time_limit_after:! input time_limit_after
+
+trigger:
+  platform: state
+  entity_id:! input motion_entity
+  from: "off"
+  is: "on"
+condition:
+  - condition: and
+    conditions:
+    - condition: time
+      after:! input time_limit_after
+      before:! input time_limit_before
+
+action:
+  - service: light.turn_on
+    target:! input light_target
+  - wait_for_trigger:
+      platform: state
+      entity_id:! input motion_entity
+      from: "on"
+      to: "off"
+  - delay:! input no_motion_wait
+  - service: light.turn_off
+    target:! input light_target
