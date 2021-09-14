@@ -38,9 +38,7 @@ blueprint:
           min: 0
           max: 600
           unit_of_measurement: seconds
-
 mode: single
-
 trigger:
   platform: state
   entity_id: !input door_entity
