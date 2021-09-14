@@ -2,7 +2,7 @@ blueprint:
   name: Window/Door open TTS announcer
   domain: automation
   input:
-    door_window_entity:
+    door_entity:
       name: Door Sensor
       description: Entity that causes announcement
       selector:
