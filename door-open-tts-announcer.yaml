@@ -51,9 +51,6 @@ condition:
   - condition: and
     conditions:
     - condition: state
-      after: !input time_limit_after
-      before: !input time_limit_before
-    - condition: state
       entity_id:  !input onoff_override
       state: "on"
 
